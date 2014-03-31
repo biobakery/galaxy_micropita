@@ -52,6 +52,8 @@ def read_params(x):
 	parser.add_argument('-n', action="store",dest='NSamples')
 	parser.add_argument('--lastmeta', action="store",dest='lastmeta')
 	parser.add_argument('--stratify_value', action="store",dest='stratify_value')
+	parser.add_argument('--root_dir', action="store", dest='root_dir',nargs='?')
+
 
 	try:
 		parser.add_argument('--feature_method', action="store",dest='feature_method')
@@ -124,13 +126,14 @@ if results.MParameter == "features":
 			OutTargetsFile.write(OutputString)
 	OutTargetsFile.close()
 	os_command = "python " + \
-        "/usr/local/galaxy-dist/tools/micropita/" + \
-	"MicroPITA.py "+\
-	"--lastmeta " + table_lines[LastMetaInt]+ " " +\
-        "--feature_method " + results.feature_method + " " + \
-	"--target " + TempTargetsFileName + " " +\
-	"-m " + results.MParameter + " " + \
-	"-n " + results.NSamples + " " +\
+		results.root_dir + \
+		"/tools/micropita/" + \
+		"MicroPITA.py "+\
+		"--lastmeta " + table_lines[LastMetaInt]+ " " +\
+		"--feature_method " + results.feature_method + " " + \
+		"--target " + TempTargetsFileName + " " +\
+		"-m " + results.MParameter + " " + \
+		"-n " + results.NSamples + " " +\
 	stratify_string + " " +\
 	results.inputname + " " +\
 	results.outputname
@@ -141,27 +144,29 @@ if results.MParameter == "representative"\
 or results.MParameter == "diverse"\
 or results.MParameter == "extreme": 
 	os_command = "python " + \
-        "/usr/local/galaxy-dist/tools/micropita/" + \
-	"MicroPITA.py "+\
-	"--lastmeta " + table_lines[LastMetaInt]+ " " +\
-	"-m " + results.MParameter + " " + \
-	"-n " + results.NSamples + " " +\
-        stratify_string + " " + \
-	results.inputname + " " +\
-	results.outputname
+		results.root_dir + \
+		"/tools/micropita/" + \
+		"MicroPITA.py "+\
+		"--lastmeta " + table_lines[LastMetaInt]+ " " +\
+		"-m " + results.MParameter + " " + \
+		"-n " + results.NSamples + " " +\
+		stratify_string + " " + \
+		results.inputname + " " +\
+		results.outputname
 	#print os_command
 	os.system(os_command)
 
 if results.MParameter == "distinct"\
 or results.MParameter == "discriminant": 
 	os_command = "python " + \
-        "/usr/local/galaxy-dist/tools/micropita/" + \
-	"MicroPITA.py "+\
-	"--lastmeta " + table_lines[LastMetaInt]+ " " +\
-	"--label " + table_lines[LastMetaInt]+ " " +\
-	"-m " + results.MParameter + " " + \
-	"-n " + results.NSamples + " " +\
-        stratify_string + " " + \
+		results.root_dir + \
+		"/tools/micropita/" + \
+		"MicroPITA.py "+\
+		"--lastmeta " + table_lines[LastMetaInt]+ " " +\
+		"--label " + table_lines[LastMetaInt]+ " " +\
+		"-m " + results.MParameter + " " + \
+		"-n " + results.NSamples + " " +\
+		stratify_string + " " + \
 	results.inputname + " " +\
 	results.outputname
 	#print os_command
