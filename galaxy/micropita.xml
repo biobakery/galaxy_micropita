@@ -90,7 +90,7 @@ microPITA is a computational tool enabling sample selection in tiered studies. U
 
 Additionally, methods can leverage clinical metadata by stratifying samples into groups in which samples are subsequently selected. This enables the use of microPITA in cohort studies.
 
-.. image:: ./static/images/HMPStool10PCoA.png
+.. image:: https://bytebucket.org/biobakery/galaxy_micropita/wiki/HMPStool10PCoA.png
 
 MicroPITA unsupervised method selection in the HMP 16S Gut Microbiome. Selection of 10 samples using targeted feature targeting *Bacteroides* (blue), maximum diversity (orange), representative dissimilarity (purple), and most dissimilar (pink) using Principle Covariance Analysis (PCoA) for ordination. Targeted feature selects samples dominated by *Bacteroides* (upper left) while maximum diversity select more diverse samples away from *Bacteroides* dominant samples. Representative selection selects samples covering the range of samples in the PCoA plot focusing on the higher density central region while maximum dissimilarity selects samples at the periphery of the plot.
 
@@ -117,8 +117,7 @@ microPITA requires an input pcl file of metadata and microbial community measure
 
 **Note** MAC users, please save file as windows formatted text.
 
-.. image:: ./static/images/pcl_diagram.png
-
+.. image:: https://bytebucket.org/biobakery/galaxy_micropita/wiki/pcl_diagram.png
  
 
 
