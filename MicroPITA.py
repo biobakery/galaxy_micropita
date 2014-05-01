@@ -35,13 +35,13 @@ __status__ = "Development"
 
 import sys
 import argparse
-from src.breadcrumbs.AbundanceTable import AbundanceTable
-from src.breadcrumbs.ConstantsBreadCrumbs import ConstantsBreadCrumbs
-from src.breadcrumbs.Metric import Metric
-from src.breadcrumbs.KMedoids import Kmedoids
-from src.breadcrumbs.MLPYDistanceAdaptor import MLPYDistanceAdaptor
-from src.breadcrumbs.SVM import SVM
-from src.breadcrumbs.UtilityMath import UtilityMath
+from src.breadcrumbs.src.AbundanceTable import AbundanceTable
+from src.breadcrumbs.src.ConstantsBreadCrumbs import ConstantsBreadCrumbs
+from src.breadcrumbs.src.Metric import Metric
+from src.breadcrumbs.src.KMedoids import Kmedoids
+from src.breadcrumbs.src.MLPYDistanceAdaptor import MLPYDistanceAdaptor
+from src.breadcrumbs.src.SVM import SVM
+from src.breadcrumbs.src.UtilityMath import UtilityMath
 
 from src.ConstantsMicropita import ConstantsMicropita
 import csv
@@ -158,6 +158,10 @@ class MicroPITA:
 		if type(distanceMatrix) is BooleanType:
 			logging.error("MicroPITA.funcGetCentralSamplesByKMedoids:: Could not read in the supplied distance matrix, returning false.")
 			return False
+
+		# Handle unifrac output
+		if sMetric in [Metric.c_strUnifracUnweighted,Metric.c_strUnifracWeighted]:
+			distanceMatrix = distanceMatrix[0]
 	
 		#Log distance matrix
 		logging.debug("MicroPITA.funcGetCentralSamplesByKMedoids:: Distance matrix for representative selection using metric="+str(sMetric))
@@ -213,9 +217,13 @@ class MicroPITA:
 		#Returns condensed matrix
 		tempDistanceMatrix = scipy.spatial.distance.squareform(Metric.funcReadMatrixFile(istmMatrixFile=istmBetaMatrix,lsSampleOrder=lsSampleNames)[0]) if istmBetaMatrix else Metric.funcGetBetaMetric(npadAbundancies=npaAbundanceMatrix, sMetric=strBetaMetric, istrmTree=istrmTree, istrmEnvr=istrmEnvr, lsSampleOrder=lsSampleNames, fAdditiveInverse = True)
 
+		if strBetaMetric in [Metric.c_strUnifracUnweighted,Metric.c_strUnifracWeighted]:
+			tempDistanceMatrix = tempDistanceMatrix[0]
+
 		if type(tempDistanceMatrix) is BooleanType:
 			logging.error("MicroPITA.funcSelectExtremeSamplesFromHClust:: Could not read in the supplied distance matrix, returning false.")
 			return False
+
 		if istmBetaMatrix:
 			tempDistanceMatrix = 1-tempDistanceMatrix
 
@@ -793,7 +801,7 @@ class MicroPITA:
 	def funcRun(self, strIDName, strLastMetadataName, istmInput,
 					  ostmInputPredictFile, ostmPredictFile, ostmCheckedFile, ostmOutput,
 					  cDelimiter, cFeatureNameDelimiter, strFeatureSelection,
-					  istmFeatures, iCount, lstrMethods, strLabel = None, strStratify = None,
+					  istmFeatures, iCount, lstrMethods, strLastRowMetadata = None, strLabel = None, strStratify = None,
 					  strCustomAlpha = None, strCustomBeta = None, strAlphaMetadata = None, istmBetaMatrix = None, istrmTree = None, istrmEnvr = None, 
 					  iMinSeqs = ConstantsMicropita.c_liOccurenceFilter[0], iMinSamples = ConstantsMicropita.c_liOccurenceFilter[1], fInvertDiversity = False):
 		"""
@@ -892,8 +900,8 @@ class MicroPITA:
 		#Abundance is a structured array. Samples (column) by Taxa (rows) with the taxa id row included as the column index=0
 		#Abundance table object to read in and manage data
 		totalAbundanceTable = AbundanceTable.funcMakeFromFile(xInputFile=istmInput, lOccurenceFilter = [iMinSeqs, iMinSamples],
-								   cDelimiter=cDelimiter, sMetadataID=strIDName, sLastMetadata=strLastMetadataName, cFeatureNameDelimiter=cFeatureNameDelimiter,
-								   xOutputFile=ostmCheckedFile)
+								cDelimiter=cDelimiter, sMetadataID=strIDName, sLastMetadataRow=strLastRowMetadata,
+								sLastMetadata=strLastMetadataName, cFeatureNameDelimiter=cFeatureNameDelimiter, xOutputFile=ostmCheckedFile)
 		if not totalAbundanceTable:
 			logging.error("MicroPITA.funcRun:: Could not read in the abundance table. Analysis was not performed."+
 				" This often occurs when the Last Metadata is not specified correctly."+
@@ -1050,15 +1058,16 @@ args.add_argument("-f","--invertDiversity", dest = "fInvertDiversity", action="s
 
 args = argp.add_argument_group( "Miscellaneous", "Row/column identifiers and feature targeting options" )
 args.add_argument("-d",ConstantsMicropita.c_strIDNameArgument, dest="strIDName", metavar="sample_id", help= ConstantsMicropita.c_strIDNameHelp)
-args.add_argument("-l",ConstantsMicropita.c_strLastMetadataNameArgument, dest="strLastMetadataName", metavar = "metadata_id",
+args.add_argument("-l",ConstantsMicropita.c_strLastMetadataNameArgument, dest="strLastMetadataName", metavar = "metadata_id", default = None,
 				  help= ConstantsMicropita.c_strLastMetadataNameHelp)
 args.add_argument("-r",ConstantsMicropita.c_strTargetedFeatureMethodArgument, dest="strFeatureSelection", metavar="targeting_method", default=ConstantsMicropita.lsTargetedFeatureMethodValues[0],
 				  choices=ConstantsMicropita.lsTargetedFeatureMethodValues, help= ConstantsMicropita.c_strTargetedFeatureMethodHelp)
-args.add_argument("-t",ConstantsMicropita.c_strTargetedSelectionFileArgument, dest="istmFeatures", metavar = "feature_file", type = argparse.FileType("rU"), help = ConstantsMicropita.c_strTargetedSelectionFileHelp)
+args.add_argument("-t",ConstantsMicropita.c_strTargetedSelectionFileArgument, dest="istmFeatures", metavar="feature_file", type=argparse.FileType("rU"), help=ConstantsMicropita.c_strTargetedSelectionFileHelp)
+args.add_argument("-w",ConstantsMicropita.c_strFeatureMetadataArgument, dest="strLastFeatureMetadata", metavar="Last_Feature_Metadata", default=None, help=ConstantsMicropita.c_strFeatureMetadataHelp)
 
 args = argp.add_argument_group( "Data labeling", "Metadata IDs for strata and supervised label values" )
-args.add_argument("-e",ConstantsMicropita.c_strSupervisedLabelArgument, dest="strLabel", metavar= "supervised_id", help= ConstantsMicropita.c_strSupervisedLabelHelp)
-args.add_argument("-s",ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, dest="strUnsupervisedStratify", metavar= "stratify_id", 
+args.add_argument("-e",ConstantsMicropita.c_strSupervisedLabelArgument, dest="strLabel", metavar= "supervised_id", help=ConstantsMicropita.c_strSupervisedLabelHelp)
+args.add_argument("-s",ConstantsMicropita.c_strUnsupervisedStratifyMetadataArgument, dest="strUnsupervisedStratify", metavar="stratify_id", 
 				  help= ConstantsMicropita.c_strUnsupervisedStratifyMetadataHelp)
 
 args = argp.add_argument_group( "File formatting", "Rarely modified file formatting options" )
@@ -1073,7 +1082,7 @@ args.add_argument("-g",ConstantsMicropita.c_strLoggingFileArgument, dest="ostmLo
 args.add_argument("-u",ConstantsMicropita.c_strSupervisedInputFile, dest="ostmInputPredictFile", metavar = "output_scaled", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedInputFileHelp)
 args.add_argument("-p",ConstantsMicropita.c_strSupervisedPredictedFile, dest="ostmPredictFile", metavar = "output_labels", type = argparse.FileType("w"), help = ConstantsMicropita.c_strSupervisedPredictedFileHelp)
 
-argp.add_argument("istmInput", metavar = "input.txt", type = argparse.FileType("rU"), help = ConstantsMicropita.c_strAbundanceFileHelp,
+argp.add_argument("istmInput", metavar = "input.pcl/biome", type = argparse.FileType("rU"), help = ConstantsMicropita.c_strAbundanceFileHelp,
 	default = sys.stdin)
 argp.add_argument("ostmOutput", metavar = "output.txt", type = argparse.FileType("w"), help = ConstantsMicropita.c_strGenericOutputDataFileHelp,
 	default = sys.stdout)
@@ -1108,6 +1117,7 @@ def _main( ):
 		istmFeatures		= args.istmFeatures,
 		strFeatureSelection	= args.strFeatureSelection,
 		iCount			= args.iCount,
+		strLastRowMetadata	= args.strLastFeatureMetadata,
 		strLabel		= args.strLabel,
 		strStratify		= args.strUnsupervisedStratify,
 		strCustomAlpha		= args.strAlphaDiversity,
