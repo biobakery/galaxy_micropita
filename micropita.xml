@@ -93,6 +93,8 @@ Additionally, methods can leverage clinical metadata by stratifying samples into
 
 
 .. image:: https://bytebucket.org/biobakery/galaxy_micropita/wiki/HMPStool10PCoA.png
+    :height: 500        
+    :width: 600  
 
 MicroPITA unsupervised method selection in the HMP 16S Gut Microbiome. Selection of 10 samples using targeted feature targeting *Bacteroides* (blue), maximum diversity (orange), representative dissimilarity (purple), and most dissimilar (pink) using Principle Covariance Analysis (PCoA) for ordination. Targeted feature selects samples dominated by *Bacteroides* (upper left) while maximum diversity select more diverse samples away from *Bacteroides* dominant samples. Representative selection selects samples covering the range of samples in the PCoA plot focusing on the higher density central region while maximum dissimilarity selects samples at the periphery of the plot.
 
@@ -120,6 +122,8 @@ microPITA requires an input pcl file of metadata and microbial community measure
 **Note** MAC users, please save file as windows formatted text.
 
 .. image:: https://bytebucket.org/biobakery/galaxy_micropita/wiki/pcl_diagram.png
+    :height: 500        
+    :width: 600  
 
 Outputs
 -------

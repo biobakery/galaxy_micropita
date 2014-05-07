@@ -40,6 +40,19 @@ import sys,string,time
 import os
 from time import gmtime, strftime
 from pprint import pprint
+import subprocess  
+import blist
+import shlex
+import tempfile
+
+##################################################################################
+#   Modification by George Weingart    5/6/2014                                  #
+#   Using subprocess to invoke the calls to Micropita                            #
+#   and allocating the temporary file using trmpfile                             #
+##################################################################################
+
+
+
 
 ##################################################################################
 #  Decode Parms                                                                  #
@@ -66,9 +79,6 @@ def read_params(x):
 		parser.add_argument('--label_value', action="store",dest='label_value')
 	except:
 		pass
-
-	
-
 	return  parser
 	
 
@@ -117,8 +127,8 @@ if results.MParameter == "features":
 		TBTargets.append(int(tb_entry))
 
 
-	TempTargetsFileName = "/tmp/micropita_targets" + FileTimeStamp
-	OutTargetsFile = open(TempTargetsFileName,"w")
+	OutTargetsFile  = tempfile.NamedTemporaryFile('w', delete=False )   
+	TempTargetsFileName = OutTargetsFile.name 
 	indx = -1
 	for  c in table_lines:
 		indx+=1
@@ -126,47 +136,67 @@ if results.MParameter == "features":
 			OutputString = table_lines[indx] + "\n"
 			OutTargetsFile.write(OutputString)
 	OutTargetsFile.close()
-
 	os_command = "python " + \
-        root_dir + "/" +\
-	"MicroPITA.py "+\
-	"--lastmeta " + table_lines[LastMetaInt]+ " " +\
-        "--feature_method " + results.feature_method + " " + \
-	"--target " + TempTargetsFileName + " " +\
-	"-m " + results.MParameter + " " + \
-	"-n " + results.NSamples + " " +\
+		root_dir + \
+		"/MicroPITA.py "+\
+		"--lastmeta " + table_lines[LastMetaInt]+ " " +\
+		"--feature_method " + results.feature_method + " " + \
+		"--target " + TempTargetsFileName + " " +\
+		"-m " + results.MParameter + " " + \
+		"-n " + results.NSamples + " " +\
 	stratify_string + " " +\
 	results.inputname + " " +\
 	results.outputname
 	#print os_command
 	os.system(os_command)
+	argsx = shlex.split(os_command)					#Split the command
+	try:
+			subprocess.check_call(argsx , shell=False)
+	except:
+			print "The call to micropita failed============="
+	sys.exit(0)
+
+
 
 if results.MParameter == "representative"\
 or results.MParameter == "diverse"\
 or results.MParameter == "extreme": 
-	os_command = "python " + \
-        root_dir + "/" +\
-	"MicroPITA.py "+\
-	"--lastmeta " + table_lines[LastMetaInt]+ " " +\
-	"-m " + results.MParameter + " " + \
-	"-n " + results.NSamples + " " +\
-        stratify_string + " " + \
-	results.inputname + " " +\
-	results.outputname
-	#print os_command
-	os.system(os_command)
-
+		os_command = "python " + \
+		root_dir +  \
+		"/MicroPITA.py "+\
+		"--lastmeta " + table_lines[LastMetaInt]+ " " +\
+		"-m " + results.MParameter + " " + \
+		"-n " + results.NSamples + " " +\
+		stratify_string + " " + \
+		results.inputname + " " +\
+		results.outputname
+		argsx = shlex.split(os_command)					#Split the command
+		try:
+				###os.system(os_command)
+				subprocess.check_call(argsx , shell=False)
+		except:
+				print "The call to micropita failed============="
+		sys.exit(0)
+ 
+	
+	
+	
 if results.MParameter == "distinct"\
 or results.MParameter == "discriminant": 
 	os_command = "python " + \
-        root_dir + "/" +\
-	"MicroPITA.py "+\
-	"--lastmeta " + table_lines[LastMetaInt]+ " " +\
-	"--label " + table_lines[LastMetaInt]+ " " +\
-	"-m " + results.MParameter + " " + \
-	"-n " + results.NSamples + " " +\
-        stratify_string + " " + \
+		root_dir + \
+		"/MicroPITA.py "+\
+		"--lastmeta " + table_lines[LastMetaInt]+ " " +\
+		"--label " + table_lines[LastMetaInt]+ " " +\
+		"-m " + results.MParameter + " " + \
+		"-n " + results.NSamples + " " +\
+		stratify_string + " " + \
 	results.inputname + " " +\
 	results.outputname
 	#print os_command
-	os.system(os_command)
+	argsx = shlex.split(os_command)					#Split the command
+	try:
+			subprocess.check_call(argsx , shell=False)
+	except:
+			print "The call to micropita failed============="
+	sys.exit(0)
