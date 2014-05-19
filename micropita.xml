@@ -73,6 +73,19 @@
   <requirements>
     <requirement type="set_environment">micropita_SCRIPT_PATH</requirement>
   </requirements>
+  <tests>
+       <test>
+             <param name="inp_data" value="micropita_input"  ftype="micropita"  />
+             <param name="cls_x" value="5" />
+             <param name="cls_s" value="5" />
+             <param name="selected_samples" value="10" />
+             <param name="cond.method_sel" value="representative" />
+             <output name="out_file1" file="micropita_output"  />
+                <assert_contents>
+                   <has_text text="representative	Sample_22_R	Sample_20_R" />
+                </assert_contents>
+       </test>
+   </tests>
   <help>
 	  
 
