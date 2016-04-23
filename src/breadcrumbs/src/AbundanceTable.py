@@ -53,6 +53,10 @@ c_fRound	= False
 c_iSumAllCladeLevels = -1
 c_fOutputLeavesOnly = False
 
+import warnings
+warnings.simplefilter(action = "ignore", category = FutureWarning)
+
+
 class RowMetadata:
 	"""
 	Holds the row (feature) metadata and associated functions.
