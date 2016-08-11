@@ -87,7 +87,8 @@ def read_params(x):
 ##################################################################################
 parser = read_params( sys.argv )
 results = parser.parse_args()
-root_dir = os.environ.get('micropita_SCRIPT_PATH')
+#root_dir = os.environ.get('micropita_SCRIPT_PATH')
+root_dir = root_dir = os.path.dirname(os.path.realpath(__file__))  #Find the current directory where the program resides  GW 20160810
 
 
 fname =  results.inputname
